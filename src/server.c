@@ -6,6 +6,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+#include "handler.h"
 
 void *handle_client(void *arg);
 
@@ -74,8 +75,7 @@ void *handle_client(void *arg) {
   if (n > 0) {
 
       printf("\nReceived: %s\n", buffer);
-      // parse_http_method(buffer);
-      // handler(method m, ); 
+      parse_http_method(buffer); 
       
      
       // sending response for client    
