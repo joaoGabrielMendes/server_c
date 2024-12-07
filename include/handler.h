@@ -1,10 +1,7 @@
 #ifndef HANDLER_H
+#define HANDLER_H
 
-typedef enum {
-  GET,
-  POST,
-  UNKNOWN_METHOD
-} Http_method;
+#include "http_common.h"
 
 Http_method parse_http_method(const char *request);
 
