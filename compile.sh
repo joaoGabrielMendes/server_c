@@ -1,5 +1,5 @@
 #!/bin/bash
 
 clear
-gcc src/main.c -o main
+gcc src/main.c src/server.c src/handler.c -o main -Iinclude
 ./main
