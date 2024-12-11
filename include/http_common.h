@@ -8,4 +8,10 @@ typedef enum {
   UNKNOWN_METHOD
 } Http_method;
 
+typedef struct HttpRequest {
+    Http_method method;
+    char *path;
+    char *version;
+} HttpRequest;
+
 #endif // !HTTP_COMMON_H

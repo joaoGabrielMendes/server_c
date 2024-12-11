@@ -7,6 +7,8 @@
 #include <pthread.h>
 #include <arpa/inet.h>
 #include "handler.h"
+#include "http_common.h"
+#include "router.h"
 
 void *handle_client(void *arg);
 
@@ -75,19 +77,60 @@ void *handle_client(void *arg) {
   if (n > 0) {
 
       printf("\nReceived: %s\n", buffer);
-      parse_http_method(buffer); 
-      
-     
-      // sending response for client    
-      char *response =
-          "HTTP/1.1 200 OK\r\n"
-          "Content-Type: text/plain; charset=utf-8\r\n"
-          "Content-Length: 13\r\n"
-          "Connection: close\r\n"
-          "\r\n"
-          "Hello, World!";
 
-      send(client_sock, response, strlen(response), 0);
+      HttpRequest *request = init_http_request();
+      if (parse_http(buffer, request) == 0) {
+          // Monta a resposta com informações da requisição
+          char response[512];
+          snprintf(response, sizeof(response),
+              "HTTP/1.1 200 OK\r\n"
+              "Content-Type: text/plain; charset=utf-8\r\n"
+              "Connection: close\r\n"
+              "\r\n"
+              "Method: %s\nPath: %s\nVersion: %s\n",
+              request->method == GET ? "GET" :
+              request->method == POST ? "POST" : "UNKNOWN",
+              request->path,
+              request->version);
+
+          // Envia a resposta para o cliente
+          send(client_sock, response, strlen(response), 0);
+      } else {
+          // Resposta para requisição inválida
+          const char *error_response =
+              "HTTP/1.1 400 Bad Request\r\n"
+              "Content-Type: text/plain; charset=utf-8\r\n"
+              "Connection: close\r\n"
+              "\r\n"
+              "Invalid HTTP request.";
+          send(client_sock, error_response, strlen(error_response), 0);
+      }
+      if (parse_http(buffer, request) == 0) {
+          // Monta a resposta com informações da requisição
+          char response[512];
+          snprintf(response, sizeof(response),
+              "HTTP/1.1 200 OK\r\n"
+              "Content-Type: text/plain; charset=utf-8\r\n"
+              "Connection: close\r\n"
+              "\r\n"
+              "Method: %s\nPath: %s\nVersion: %s\n",
+              request->method == GET ? "GET" :
+              request->method == POST ? "POST" : "UNKNOWN",
+              request->path,
+              request->version);
+
+          // Envia a resposta para o cliente
+          send(client_sock, response, strlen(response), 0);
+      } else {
+          // Resposta para requisição inválida
+          const char *error_response =
+              "HTTP/1.1 400 Bad Request\r\n"
+              "Content-Type: text/plain; charset=utf-8\r\n"
+              "Connection: close\r\n"
+              "\r\n"
+              "Invalid HTTP request.";
+          send(client_sock, error_response, strlen(error_response), 0);
+      }
     }
 
   close(client_sock);

@@ -1,4 +1,5 @@
 #include "handler.h"
+#include "http_common.h"
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
@@ -6,27 +7,20 @@ int main(int argc, char *argv[]) {
   const char *request2 = "GET /users HTTP/1.1";
   const char *request3 = "SEX /users HTTP/1.1";
 
-
-  Http_method method1 = parse_http_method(request1);
-  if (method1 == POST) {
-    printf("OK \n");
+  HttpRequest *request = init_http_request();
+  int success = parse_http_line(request1, request);
+  
+  if (success == 0) {
+    // Imprimir os valores de path e version corretamente
+    printf("PATH: %s\n", request->path);
+    printf("VERSION: %s\n", request->version);
   } else {
-    printf("FAIL \n");
+    printf("Erro ao processar a requisição.\n");
   }
 
-  Http_method method2 = parse_http_method(request2);
-  if (method2 == GET) {
-    printf("OK \n");
-  } else {
-    printf("FAIL \n");
-  }
-
-  Http_method method3 = parse_http_method(request3);
-  if (method3 == UNKNOWN_METHOD) {
-    printf("OK \n");
-  } else {
-    printf("FAIL \n");
-  }
+  // Liberar a memória alocada para a estrutura HttpRequest
+  free_http_request(request);
 
   return 0;
 }
+
